@@ -2,149 +2,363 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07090c">
+<meta name="description" content="Kinz Scanning — detailed device diagnostics and phone specification dashboard.">
 <title>Kinz Scanning</title>
+
+<!-- Google AdSense: replace the placeholder client ID with your approved publisher ID. -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-REPLACE_ME" crossorigin="anonymous"></script>
+
 <style>
-:root{color-scheme:dark;--bg:#07090b;--card:#101419;--line:#242b33;--text:#f2f5f7;--muted:#8c97a3;--accent:#8bd8ff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px system-ui,-apple-system,Segoe UI,sans-serif}
-main{max-width:900px;margin:auto;padding:20px}
-.hero{padding:28px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(145deg,#141a20,#0a0d10)}
-.kicker{color:var(--muted);font-size:11px;letter-spacing:.18em;text-transform:uppercase}.title{font-size:38px;font-weight:800;letter-spacing:-.05em;margin:5px 0}.sub{color:var(--muted);line-height:1.5}
-button,input,select{font:inherit}.scan{margin-top:20px;width:100%;height:50px;border:0;border-radius:14px;background:var(--accent);color:#071016;font-weight:800;cursor:pointer}
-.ad{height:70px;margin:14px 0;border:1px dashed #3a424b;border-radius:14px;display:grid;place-items:center;color:#69747f;font-size:10px;letter-spacing:.14em}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{padding:15px;border:1px solid var(--line);border-radius:16px;background:var(--card)}.stat b{display:block;font-size:20px}.stat span{color:var(--muted);font-size:11px}
-.tools{display:flex;gap:10px;margin:14px 0}.search,.filter{height:46px;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:13px;padding:0 13px;outline:0}.search{flex:1}.search:focus,.filter:focus{border-color:var(--accent)}
-.category{margin:10px 0;border:1px solid var(--line);border-radius:18px;background:var(--card);overflow:hidden}.head{width:100%;padding:16px;background:none;color:inherit;border:0;text-align:left;display:flex;justify-content:space-between;cursor:pointer}.name{font-weight:750}.count{color:var(--muted);font-size:11px;margin-top:3px}.body{display:none;border-top:1px solid var(--line)}.category.open .body{display:block}
-.row{display:flex;justify-content:space-between;gap:15px;padding:12px 16px;border-bottom:1px solid #1c2228}.row:last-child{border:0}.label{color:var(--muted)}.value{text-align:right;overflow-wrap:anywhere}.det{color:#b9f4d0}.lookup{color:#f1d28f}.na{color:#77818b}
-small{color:var(--muted)}footer{text-align:center;color:#66717d;font-size:11px;padding:20px}
-@media(max-width:520px){main{padding:12px}.title{font-size:31px}.tools{flex-direction:column}.stats{gap:7px}.stat{padding:12px 9px}.row{padding:11px 12px;font-size:12px}}
+:root{
+ --bg:#07090c;--panel:#0d1116;--card:#11161c;--card2:#151b22;--line:#252d36;
+ --text:#f4f7fa;--muted:#8b96a2;--accent:#8dd9ff;--good:#a8efc6;--warn:#f3d28d;--bad:#ff9c9c;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 50% -10%,#17212a 0,#07090c 42%);color:var(--text);font:14px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}
+main{width:min(100%,980px);margin:auto;padding:16px}
+.hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:28px;padding:26px;background:linear-gradient(145deg,#151b22,#0a0d11)}
+.hero:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;right:-100px;top:-130px;background:rgba(141,217,255,.08);filter:blur(2px)}
+.kicker{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:clamp(34px,8vw,54px);line-height:1;letter-spacing:-.055em;margin:8px 0 10px}
+.hero p{margin:0;color:var(--muted);max-width:620px;font-size:14px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.primary,.secondary{min-height:48px;border-radius:14px;padding:0 18px;font-weight:800;border:1px solid var(--line)}
+.primary{background:var(--accent);color:#071016;border-color:transparent;min-width:180px}
+.secondary{background:var(--card);color:var(--text)}
+.primary:disabled{opacity:.65;cursor:wait}
+.adwrap{margin:14px 0}
+.adlabel{text-align:center;color:#66717c;font-size:9px;letter-spacing:.14em;margin-bottom:5px}
+.adsbygoogle{display:block;min-height:52px;border:1px dashed #303842;border-radius:14px;background:#0a0d10}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:14px 0}
+.stat{border:1px solid var(--line);background:var(--card);border-radius:17px;padding:14px;min-width:0}
+.stat b{display:block;font-size:22px;letter-spacing:-.03em}.stat span{color:var(--muted);font-size:10px}
+.detect{margin:14px 0;padding:18px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,#11171d,#0d1116)}
+.detecttop{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.device-name{font-size:22px;font-weight:800;letter-spacing:-.03em}
+.device-meta{color:var(--muted);font-size:12px;margin-top:3px}
+.badge{display:inline-flex;align-items:center;border:1px solid #31505f;border-radius:999px;padding:5px 9px;font-size:10px;color:var(--accent);white-space:nowrap}
+.modelrow{display:flex;gap:9px;margin-top:14px}
+.modelrow input,.modelrow select{flex:1;min-width:0;height:44px;border:1px solid var(--line);border-radius:12px;background:#090c10;color:var(--text);padding:0 12px;outline:0}
+.modelrow input:focus,.modelrow select:focus,.search:focus{border-color:var(--accent)}
+.tools{display:flex;gap:9px;margin:14px 0}.search{flex:1;min-width:0;height:46px;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--text);padding:0 13px;outline:0}.filter{height:46px;max-width:220px;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--text);padding:0 12px}
+.category{margin:10px 0;border:1px solid var(--line);border-radius:19px;background:var(--card);overflow:hidden}
+.cathead{width:100%;border:0;background:none;color:var(--text);padding:16px;display:flex;align-items:center;justify-content:space-between;text-align:left}
+.catname{font-weight:800}.catcount{color:var(--muted);font-size:10px;margin-top:2px}.arrow{color:var(--muted);transition:transform .2s}
+.category.open .arrow{transform:rotate(180deg)}.rows{display:none;border-top:1px solid var(--line)}.category.open .rows{display:block}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,1.15fr);gap:14px;padding:12px 16px;border-bottom:1px solid #1c2228}
+.row:last-child{border-bottom:0}.label{color:var(--muted)}.value{text-align:right;overflow-wrap:anywhere}
+.live{color:var(--good)}.spec{color:var(--warn)}.unknown{color:#727d88}
+.source{display:block;font-size:9px;color:#68737e;margin-top:2px}
+.note{margin:12px 0;padding:13px 15px;border:1px solid #28323a;border-radius:14px;color:var(--muted);font-size:11px;background:#0b0f13}
+.footer{text-align:center;color:#66717c;font-size:10px;padding:22px 5px}
+.toast{position:fixed;left:50%;bottom:18px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#e9f7ff;color:#071016;padding:10px 14px;border-radius:12px;font-weight:700;font-size:12px;transition:.25s;z-index:5}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:680px){
+ main{padding:11px}.stats{grid-template-columns:repeat(2,1fr)}.tools{flex-direction:column}.filter{max-width:none}
+ .modelrow{flex-direction:column}.detecttop{flex-direction:column}.row{grid-template-columns:1fr}.value{text-align:left}
+}
+@media(prefers-reduced-motion:no-preference){
+ .hero,.detect,.category,.stat{animation:rise .45s ease both}.category:nth-child(2){animation-delay:.03s}.category:nth-child(3){animation-delay:.06s}
+ @keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+}
 </style>
 </head>
 <body>
 <main>
 <section class="hero">
 <div class="kicker">Device intelligence</div>
-<div class="title">Kinz Scanning</div>
-<div class="sub">A deep device, browser, network and hardware-information dashboard.</div>
-<button class="scan" id="scan">Run Full Scan</button>
+<h1>Kinz Scanning</h1>
+<p>Deep, honest device diagnostics — live browser data plus verified phone specifications when a model can be identified.</p>
+<div class="actions">
+<button class="primary" id="scan" type="button">Run Full Scan</button>
+<button class="secondary" id="share" type="button">Share</button>
+</div>
 </section>
 
-<div class="ad">ADVERTISEMENT · BANNER</div>
+<div class="adwrap">
+<div class="adlabel">ADVERTISEMENT</div>
+<ins class="adsbygoogle" data-ad-client="ca-pub-REPLACE_ME" data-ad-slot="REPLACE_SLOT_1" data-ad-format="auto" data-full-width-responsive="true"></ins>
+</div>
+
+<section class="detect">
+<div class="detecttop">
+<div>
+<div class="device-name" id="deviceName">Detecting device…</div>
+<div class="device-meta" id="deviceMeta">Reading available browser/device hints</div>
+</div>
+<span class="badge" id="status">SCANNING</span>
+</div>
+<div class="modelrow">
+<input id="modelInput" list="models" placeholder="Enter phone model if not detected">
+<datalist id="models"></datalist>
+<select id="modelSelect" aria-label="Choose phone model"><option value="">Choose model…</option></select>
+</div>
+<div class="note">Some phone hardware data is deliberately not exposed to websites. Kinz Scanning never invents a value: live values are marked <b>Live</b>, specification values are marked <b>Spec</b>, and unavailable values stay <b>Not verified</b>.</div>
+</section>
 
 <section class="stats">
-<div class="stat"><b id="detected">0</b><span>Detected now</span></div>
-<div class="stat"><b id="total">0</b><span>Parameters</span></div>
-<div class="stat"><b id="categories">0</b><span>Categories</span></div>
+<div class="stat"><b id="liveCount">0</b><span>Live values</span></div>
+<div class="stat"><b id="specCount">0</b><span>Spec values</span></div>
+<div class="stat"><b id="paramCount">0</b><span>Parameters</span></div>
+<div class="stat"><b id="catCount">0</b><span>Categories</span></div>
 </section>
 
 <div class="tools">
-<input class="search" id="search" placeholder="Search parameters…">
-<select class="filter" id="filter"><option value="all">All categories</option></select>
+<input class="search" id="search" placeholder="Search 150+ parameters…" aria-label="Search parameters">
+<select class="filter" id="filter" aria-label="Filter categories"><option value="all">All categories</option></select>
 </div>
 
 <div id="dashboard"></div>
 
-<div class="ad">ADVERTISEMENT · BANNER</div>
-<footer>Kinz Scanning · Detected values come from the browser/device. Lookup values require a device model and specification source.</footer>
+<div class="adwrap">
+<div class="adlabel">ADVERTISEMENT</div>
+<ins class="adsbygoogle" data-ad-client="ca-pub-REPLACE_ME" data-ad-slot="REPLACE_SLOT_2" data-ad-format="auto" data-full-width-responsive="true"></ins>
+</div>
+
+<div class="footer">Kinz Scanning · Built for transparent device information. Specifications should be checked against the manufacturer's current documentation before making purchasing or repair decisions.</div>
 </main>
+<div class="toast" id="toast"></div>
 
 <script>
-const n=navigator,s=screen,c=n.connection||n.mozConnection||n.webkitConnection;
-const D={
-"Device model":null,"OS version":null,"Browser version":null,"Browser engine":null,"JavaScript engine":null,
-"User agent":n.userAgent,"Platform":n.platform,"Language":n.language,"Languages":n.languages?.join(", "),
-"Online":n.onLine?"Yes":"No","Cookies enabled":n.cookieEnabled?"Yes":"No","Do Not Track":n.doNotTrack||"Not reported",
-"Logical CPU cores":n.hardwareConcurrency||null,"Reported RAM":n.deviceMemory?`${n.deviceMemory} GB`:null,"Max touch points":n.maxTouchPoints,
-"Screen width":s.width+" px","Screen height":s.height+" px","Available width":s.availWidth+" px","Available height":s.availHeight+" px",
-"Viewport width":innerWidth+" px","Viewport height":innerHeight+" px","Pixel ratio":devicePixelRatio,
-"Color depth":s.colorDepth+" bit","Pixel depth":s.pixelDepth+" bit","Orientation":s.orientation?.type,
-"Timezone":Intl.DateTimeFormat().resolvedOptions().timeZone,"UTC offset":(-new Date().getTimezoneOffset())+" min",
-"HTTPS":location.protocol==="https:"?"Yes":"No","Connection type":c?.type,"Effective connection":c?.effectiveType,
-"Downlink":c?.downlink?c.downlink+" Mbps":null,"RTT":c?.rtt?c.rtt+" ms":null,"Data saver":c?.saveData!=null?(c.saveData?"Yes":"No"):null,
-"Battery level":null,"Charging":null,
-"Battery health":null,"Battery capacity":null,"Charging wattage":null,"Wireless charging":null,"Reverse wireless charging":null,
-"CPU model":null,"CPU architecture":null,"CPU clock":null,"CPU fabrication":null,"GPU model":null,"GPU architecture":null,"GPU frequency":null,
-"RAM hardware":null,"RAM type":null,"LPDDR type":null,"Storage variants":null,"UFS version":null,
-"Display panel":null,"Display resolution":null,"Aspect ratio":null,"PPI":null,"Peak brightness":null,"Typical brightness":null,
-"Peak refresh rate":null,"Touch sampling rate":null,"Screen protection":null,"HDR":matchMedia("(dynamic-range: high)").matches?"Likely supported":null,
-"5G bands":null,"4G bands":null,"SIM type":null,"eSIM":null,"Dual SIM":null,"VoLTE":null,"VoNR":null,"Wi-Fi version":null,
-"Wi-Fi bands":null,"Wi-Fi maximum speed":null,"Wi-Fi calling":null,"Bluetooth version":null,"Bluetooth codecs":null,
-"NFC hardware":null,"Satellite connectivity":null,
-"Main camera MP":null,"Main camera aperture":null,"Main camera OIS":null,"Ultrawide MP":null,"Telephoto MP":null,
-"Front camera MP":null,"Optical zoom":null,"Digital zoom":null,"Macro camera":null,"Depth camera":null,"Main video maximum":null,
-"Front video maximum":null,"Slow motion":null,"Pro video":null,"RAW camera":null,"RAW video":null,"Dolby Vision":null,"HDR10+":null,
-"USB version":null,"USB speed":null,"USB OTG":null,"3.5mm jack":null,"Stereo speakers":null,"Audio codecs":null,"Video codecs":null,
-"Fingerprint sensor":null,"Face unlock":null,"Water resistance":null,"IR blaster":null,"FM radio":null,
-"Launch date":null,"Dimensions":null,"Weight":null,"Original price":null,
-"Web Share API":"share" in n?"Supported":"Unavailable","WebAuthn":"PublicKeyCredential" in window?"Supported":"Unavailable",
-"Bluetooth API":"bluetooth" in n?"Supported":"Unavailable","USB API":"usb" in n?"Supported":"Unavailable",
-"NFC API":"NDEFReader" in window?"Supported":"Unavailable","Geolocation API":"geolocation" in n?"Supported":"Unavailable",
-"Media devices":"mediaDevices" in n?"Supported":"Unavailable","Vibration API":"vibrate" in n?"Supported":"Unavailable",
-"Gamepad API":"getGamepads" in n?"Supported":"Unavailable","WebGL":(()=>{try{return !!document.createElement("canvas").getContext("webgl")}catch{return false}})()?"Supported":"Unavailable",
-"WebGL2":(()=>{try{return !!document.createElement("canvas").getContext("webgl2")}catch{return false}})()?"Supported":"Unavailable",
-"WebGPU":"gpu" in n?"Supported":"Unavailable","Service workers":"serviceWorker" in n?"Supported":"Unavailable",
-"Web workers":"Worker" in window?"Supported":"Unavailable","WebAssembly":"WebAssembly" in window?"Supported":"Unavailable",
-"IndexedDB":"indexedDB" in window?"Supported":"Unavailable","WebRTC":"RTCPeerConnection" in window?"Supported":"Unavailable",
-"Fetch API":"fetch" in window?"Supported":"Unavailable","WebSocket":"WebSocket" in window?"Supported":"Unavailable",
-"Crypto API":"crypto" in n?"Supported":"Unavailable","WebCodecs":"VideoDecoder" in window?"Supported":"Unavailable",
-"Media recorder":"MediaRecorder" in window?"Supported":"Unavailable","Picture-in-picture":"pictureInPictureEnabled" in document?"Supported":"Unavailable",
-"Media session":"mediaSession" in n?"Supported":"Unavailable","Wake lock":"wakeLock" in n?"Supported":"Unavailable",
-"Payment Request":"PaymentRequest" in window?"Supported":"Unavailable","Serial API":"serial" in n?"Supported":"Unavailable",
-"MIDI API":"requestMIDIAccess" in n?"Supported":"Unavailable","Speech recognition":("SpeechRecognition" in window||"webkitSpeechRecognition" in window)?"Supported":"Unavailable",
-"Speech synthesis":"speechSynthesis" in window?"Supported":"Unavailable","Barcode detection":"BarcodeDetector" in window?"Supported":"Unavailable",
-"File System Access":"showOpenFilePicker" in window?"Supported":"Unavailable","Screen capture":"getDisplayMedia" in (n.mediaDevices||{})?"Supported":"Unavailable",
+(() => {
+"use strict";
+
+const n=navigator, s=screen, c=n.connection||n.mozConnection||n.webkitConnection;
+const $=x=>document.querySelector(x);
+const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1800)};
+const supported=(x)=>x?"Supported":"Unavailable";
+const data={};
+const add=(k,v,type="live",source="Browser")=>data[k]={value:(v===undefined||v===null||v==="")?null:String(v),type,source};
+
+add("User agent",n.userAgent);
+add("Platform",n.platform);
+add("Language",n.language);
+add("Languages",n.languages?.join(", "));
+add("Online",n.onLine?"Yes":"No");
+add("Cookies enabled",n.cookieEnabled?"Yes":"No");
+add("Do Not Track",n.doNotTrack||"Not reported");
+add("Logical CPU cores",n.hardwareConcurrency);
+add("Reported device memory",n.deviceMemory?n.deviceMemory+" GB":null);
+add("Max touch points",n.maxTouchPoints);
+add("Screen width",s.width+" px");add("Screen height",s.height+" px");
+add("Available width",s.availWidth+" px");add("Available height",s.availHeight+" px");
+add("Viewport width",innerWidth+" px");add("Viewport height",innerHeight+" px");
+add("Pixel ratio",devicePixelRatio);
+add("Color depth",s.colorDepth+" bit");add("Pixel depth",s.pixelDepth+" bit");
+add("Orientation",s.orientation?.type);
+add("Timezone",Intl.DateTimeFormat().resolvedOptions().timeZone);
+add("UTC offset",(-new Date().getTimezoneOffset())+" minutes");
+add("HTTPS",location.protocol==="https:"?"Yes":"No");
+add("Connection type",c?.type);add("Effective connection",c?.effectiveType);
+add("Downlink",c?.downlink?c.downlink+" Mbps":null);add("RTT",c?.rtt?c.rtt+" ms":null);
+add("Data saver",c?.saveData!==undefined?(c.saveData?"Yes":"No"):null);
+
+add("Battery level",null);add("Charging",null);add("Charging time",null);add("Discharging time",null);
+[
+["Battery health"],["Battery capacity"],["Charging wattage"],["Wireless charging"],["Reverse wireless charging"]
+].forEach(([k])=>add(k,null,"spec"));
+
+[
+["CPU model"],["CPU architecture"],["CPU clock"],["CPU fabrication"],["GPU model"],["GPU architecture"],["GPU frequency"],
+["RAM hardware"],["RAM type"],["LPDDR type"],["Storage variants"],["UFS version"],["AnTuTu score"],["Geekbench score"]
+].forEach(([k])=>add(k,null,"spec"));
+
+[
+["Display panel"],["Display resolution"],["Aspect ratio"],["PPI"],["Peak brightness"],["Typical brightness"],
+["Peak refresh rate"],["Touch sampling rate"],["Screen protection"],["HDR support"]
+].forEach(([k])=>add(k,null,"spec"));
+
+[
+["5G bands"],["4G bands"],["3G bands"],["2G bands"],["SIM type"],["eSIM"],["Dual SIM"],["VoLTE"],["VoNR"],
+["Wi-Fi version"],["Wi-Fi bands"],["Wi-Fi maximum speed"],["Wi-Fi calling"],["Bluetooth version"],["Bluetooth codecs"],
+["NFC hardware"],["Satellite connectivity"],["USB version"],["USB speed"],["USB OTG"]
+].forEach(([k])=>add(k,null,"spec"));
+
+[
+["Main camera MP"],["Main camera aperture"],["Main camera OIS"],["Ultrawide MP"],["Ultrawide aperture"],["Telephoto MP"],
+["Telephoto aperture"],["Front camera MP"],["Optical zoom"],["Digital zoom"],["Macro camera"],["Depth camera"],
+["Main video maximum"],["Front video maximum"],["Slow motion"],["Pro video"],["RAW camera"],["RAW video"],
+["Dolby Vision"],["HDR10+"]
+].forEach(([k])=>add(k,null,"spec"));
+
+[
+["Stereo speakers"],["3.5mm jack"],["Audio codecs"],["Video codecs"],["Fingerprint sensor"],["Face unlock"],
+["Water resistance"],["IR blaster"],["FM radio"],["Launch date"],["Dimensions"],["Weight"],["Original price"]
+].forEach(([k])=>add(k,null,"spec"));
+
+const api={
+"Battery Status API":"getBattery" in n,
+"User-Agent Client Hints":"userAgentData" in n,
+"Web Share API":"share" in n,"WebAuthn":"PublicKeyCredential" in window,"Bluetooth API":"bluetooth" in n,
+"USB API":"usb" in n,"NFC API":"NDEFReader" in window,"Geolocation API":"geolocation" in n,
+"Media Devices":"mediaDevices" in n,"Vibration API":"vibrate" in n,"Gamepad API":"getGamepads" in n,
+"WebGL":(()=>{try{return !!document.createElement("canvas").getContext("webgl")}catch{return false}})(),
+"WebGL2":(()=>{try{return !!document.createElement("canvas").getContext("webgl2")}catch{return false}})(),
+"WebGPU":"gpu" in n,"Service Workers":"serviceWorker" in n,"Web Workers":"Worker" in window,
+"WebAssembly":"WebAssembly" in window,"IndexedDB":"indexedDB" in window,"WebRTC":"RTCPeerConnection" in window,
+"Fetch API":"fetch" in window,"WebSocket":"WebSocket" in window,"Crypto API":"crypto" in n,
+"WebCodecs":"VideoDecoder" in window,"Media Recorder":"MediaRecorder" in window,
+"Picture-in-Picture":"pictureInPictureEnabled" in document,"Media Session":"mediaSession" in n,
+"Wake Lock":"wakeLock" in n,"Payment Request":"PaymentRequest" in window,"Serial API":"serial" in n,
+"MIDI API":"requestMIDIAccess" in n,"Speech recognition":("SpeechRecognition" in window||"webkitSpeechRecognition" in window),
+"Speech synthesis":"speechSynthesis" in window,"Barcode detection":"BarcodeDetector" in window,
+"File System Access":"showOpenFilePicker" in window,"Screen capture":"getDisplayMedia" in (n.mediaDevices||{}),
+"Fullscreen API":"fullscreenEnabled" in document,"Clipboard API":"clipboard" in n,
+"Credentials API":"credentials" in n,"XR API":"xr" in n,
 "Pointer type":matchMedia("(pointer:fine)").matches?"Fine":matchMedia("(pointer:coarse)").matches?"Coarse":"Unknown",
-"Hover support":matchMedia("(hover:hover)").matches?"Yes":"No","Dark mode":matchMedia("(prefers-color-scheme: dark)").matches?"Yes":"No",
-"Reduced motion":matchMedia("(prefers-reduced-motion: reduce)").matches?"Yes":"No","Fullscreen API":"fullscreenEnabled" in document?"Supported":"Unavailable",
-"Clipboard API":"clipboard" in n?"Supported":"Unavailable","Credentials API":"credentials" in n?"Supported":"Unavailable",
-"XR API":"xr" in n?"Supported":"Unavailable","Storage estimate":null,"Security patch":null,"Kernel version":null,"Android API level":null,
-"iOS version":null,"Bootloader status":null,"AnTuTu score":null,"Geekbench score":null
+"Hover support":matchMedia("(hover:hover)").matches?"Yes":"No",
+"Dark mode":matchMedia("(prefers-color-scheme: dark)").matches?"Yes":"No",
+"Reduced motion":matchMedia("(prefers-reduced-motion: reduce)").matches?"Yes":"No"
 };
+Object.entries(api).forEach(([k,v])=>add(k,typeof v==="boolean"?supported(v):v));
 
 const groups={
-"Identity":["Device model","OS version","Browser version","Browser engine","JavaScript engine","User agent","Platform","Language","Languages"],
-"Display":["Screen width","Screen height","Available width","Available height","Viewport width","Viewport height","Pixel ratio","Color depth","Pixel depth","Orientation","Display panel","Display resolution","Aspect ratio","PPI","Peak brightness","Typical brightness","Peak refresh rate","Touch sampling rate","Screen protection","HDR"],
-"Battery & Power":["Battery level","Charging","Battery health","Battery capacity","Charging wattage","Wireless charging","Reverse wireless charging"],
-"Processor & Memory":["CPU model","CPU architecture","CPU clock","CPU fabrication","Logical CPU cores","Reported RAM","RAM hardware","RAM type","LPDDR type","GPU model","GPU architecture","GPU frequency","Storage variants","UFS version","AnTuTu score","Geekbench score"],
-"Connectivity":["5G bands","4G bands","SIM type","eSIM","Dual SIM","VoLTE","VoNR","Wi-Fi version","Wi-Fi bands","Wi-Fi maximum speed","Wi-Fi calling","Bluetooth version","Bluetooth codecs","NFC hardware","Satellite connectivity","Connection type","Effective connection","Downlink","RTT","Data saver"],
-"Camera":["Main camera MP","Main camera aperture","Main camera OIS","Ultrawide MP","Telephoto MP","Front camera MP","Optical zoom","Digital zoom","Macro camera","Depth camera","Main video maximum","Front video maximum","Slow motion","Pro video","RAW camera","RAW video","Dolby Vision","HDR10+"],
-"Ports & Audio":["USB version","USB speed","USB OTG","3.5mm jack","Stereo speakers","Audio codecs","Video codecs","IR blaster","FM radio"],
-"Sensors & Security":["Fingerprint sensor","Face unlock","Water resistance","WebAuthn","Geolocation API","Bluetooth API","NFC API","USB API","Vibration API","Wake lock","Credentials API"],
-"Web & Browser":["Web Share API","Media devices","WebRTC","WebGL","WebGL2","WebGPU","Service workers","Web workers","WebAssembly","IndexedDB","Fetch API","WebSocket","Crypto API","WebCodecs","Media recorder","Picture-in-picture","Media session","Payment Request"],
-"Advanced APIs":["Serial API","MIDI API","Speech recognition","Speech synthesis","Barcode detection","File System Access","Screen capture","Fullscreen API","Clipboard API","XR API","Gamepad API"],
-"Network & System":["Online","Cookies enabled","Do Not Track","HTTPS","Timezone","UTC offset","Pointer type","Hover support","Dark mode","Reduced motion","Storage estimate","Security patch","Kernel version","Android API level","iOS version","Bootloader status"],
-"Physical & Commercial":["Launch date","Dimensions","Weight","Original price"]
+"Overview":["Device model","OS version","Browser version","Browser engine","JavaScript engine","Platform","User agent","Language","Languages"],
+"Display":["Screen width","Screen height","Available width","Available height","Viewport width","Viewport height","Pixel ratio","Color depth","Pixel depth","Orientation","Display panel","Display resolution","Aspect ratio","PPI","Peak brightness","Typical brightness","Peak refresh rate","Touch sampling rate","Screen protection","HDR support"],
+"Battery & Power":["Battery level","Charging","Charging time","Discharging time","Battery health","Battery capacity","Charging wattage","Wireless charging","Reverse wireless charging"],
+"Processor & Memory":["CPU model","CPU architecture","CPU clock","CPU fabrication","Logical CPU cores","Reported device memory","RAM hardware","RAM type","LPDDR type","GPU model","GPU architecture","GPU frequency","Storage variants","UFS version","AnTuTu score","Geekbench score"],
+"Cellular & Network":["5G bands","4G bands","3G bands","2G bands","SIM type","eSIM","Dual SIM","VoLTE","VoNR","Connection type","Effective connection","Downlink","RTT","Data saver","Wi-Fi version","Wi-Fi bands","Wi-Fi maximum speed","Wi-Fi calling"],
+"Bluetooth & Connectivity":["Bluetooth version","Bluetooth codecs","NFC hardware","Satellite connectivity","USB version","USB speed","USB OTG"],
+"Camera & Video":["Main camera MP","Main camera aperture","Main camera OIS","Ultrawide MP","Ultrawide aperture","Telephoto MP","Telephoto aperture","Front camera MP","Optical zoom","Digital zoom","Macro camera","Depth camera","Main video maximum","Front video maximum","Slow motion","Pro video","RAW camera","RAW video","Dolby Vision","HDR10+"],
+"Audio & Sensors":["Stereo speakers","3.5mm jack","Audio codecs","Video codecs","Fingerprint sensor","Face unlock","Water resistance","IR blaster","FM radio"],
+"Physical & Commercial":["Launch date","Dimensions","Weight","Original price"],
+"Browser & Web APIs":["Battery Status API","User-Agent Client Hints","Web Share API","WebAuthn","Geolocation API","Media Devices","WebRTC","WebGL","WebGL2","WebGPU","Service Workers","Web Workers","WebAssembly","IndexedDB","Fetch API","WebSocket","Crypto API","WebCodecs","Media Recorder","Picture-in-Picture","Media Session","Wake Lock","Payment Request","Fullscreen API","Clipboard API","Credentials API"],
+"Advanced APIs":["Bluetooth API","USB API","NFC API","Vibration API","Gamepad API","Serial API","MIDI API","Speech recognition","Speech synthesis","Barcode detection","File System Access","Screen capture","XR API"],
+"System & Environment":["Online","Cookies enabled","Do Not Track","HTTPS","Timezone","UTC offset","Pointer type","Hover support","Dark mode","Reduced motion","Max touch points"],
+"Security & Platform":["OS version","Kernel version","Security patch","Android API level","iOS version","Bootloader status"]
 };
+["OS version","Browser version","Browser engine","JavaScript engine","Kernel version","Security patch","Android API level","iOS version","Bootloader status"].forEach(k=>{if(!data[k])add(k,null,"spec")});
 
-const lookup=new Set(Object.keys(D).filter(k=>D[k]===null));
-const dash=document.querySelector("#dashboard"), search=document.querySelector("#search"), filter=document.querySelector("#filter");
-Object.keys(groups).forEach(g=>filter.add(new Option(g,g)));
-
-function show(){
- let q=search.value.toLowerCase(), f=filter.value;dash.innerHTML="";
- for(const [g,items] of Object.entries(groups)){
-  if(f!=="all"&&f!==g)continue;
-  const rows=items.filter(x=>x.toLowerCase().includes(q));
-  if(!rows.length)continue;
-  const sec=document.createElement("section");sec.className="category";
-  const head=document.createElement("button");head.className="head";head.type="button";
-  head.innerHTML=`<span><span class="name">${g}</span><br><span class="count">${rows.length} parameters</span></span><span>⌄</span>`;
-  const body=document.createElement("div");body.className="body";
-  rows.forEach(k=>{const r=document.createElement("div");r.className="row";let v=D[k], cls=lookup.has(k)?(v?"lookup":"na"):(v?"det":"na");r.innerHTML=`<span class="label">${k}</span><span class="value ${cls}">${v??"Lookup required"}</span>`;body.appendChild(r)});
-  head.onclick=()=>sec.classList.toggle("open");sec.append(head,body);dash.appendChild(sec);
- }
- document.querySelector("#total").textContent=Object.keys(D).length;
- document.querySelector("#categories").textContent=Object.keys(groups).length;
- document.querySelector("#detected").textContent=Object.values(D).filter(v=>v!==null&&v!=="").length;
+const catalog={
+"Samsung Galaxy S25 Ultra":{
+"OS version":"Android 15 at launch","CPU model":"Qualcomm Snapdragon 8 Elite for Galaxy","CPU architecture":"64-bit","GPU model":"Adreno 830",
+"Display panel":"Dynamic AMOLED 2X","Display resolution":"3120 × 1440","Peak refresh rate":"120 Hz","Battery capacity":"5000 mAh","Charging wattage":"45 W wired",
+"Main camera MP":"200 MP","Ultrawide MP":"50 MP","Telephoto MP":"50 MP","Front camera MP":"12 MP","Main camera OIS":"Yes","Optical zoom":"3× / 5×","Water resistance":"IP68",
+"Wi-Fi version":"Wi-Fi 7","Bluetooth version":"5.4","USB version":"USB 3.2 Gen 1","Fingerprint sensor":"Ultrasonic under-display","Stereo speakers":"Yes"
+},
+"Google Pixel 10 Pro XL":{
+"CPU model":"Google Tensor G5","Display panel":"LTPO OLED","Peak refresh rate":"120 Hz","Battery capacity":"5200 mAh",
+"Main camera MP":"50 MP","Ultrawide MP":"48 MP","Telephoto MP":"48 MP","Front camera MP":"42 MP","Main camera OIS":"Yes","Water resistance":"IP68",
+"Wi-Fi version":"Wi-Fi 7","Bluetooth version":"6.0","eSIM":"Yes","Fingerprint sensor":"Ultrasonic under-display","Stereo speakers":"Yes"
+},
+"OnePlus 13":{
+"OS version":"Android 15 at launch","CPU model":"Qualcomm Snapdragon 8 Elite","Display panel":"LTPO AMOLED","Display resolution":"3168 × 1440",
+"Peak refresh rate":"120 Hz","Battery capacity":"6000 mAh","Charging wattage":"100 W wired","Wireless charging":"50 W","Main camera MP":"50 MP","Ultrawide MP":"50 MP",
+"Telephoto MP":"50 MP","Front camera MP":"32 MP","Main camera OIS":"Yes","Water resistance":"IP68/IP69","Wi-Fi version":"Wi-Fi 7","Bluetooth version":"5.4",
+"USB version":"USB 3.2 Gen 1","Fingerprint sensor":"Ultrasonic under-display","Stereo speakers":"Yes"
+},
+"Xiaomi 15 Ultra":{
+"OS version":"Android 15 at launch","CPU model":"Qualcomm Snapdragon 8 Elite","Display panel":"LTPO AMOLED","Display resolution":"3200 × 1440",
+"Peak refresh rate":"120 Hz","Battery capacity":"5410 mAh","Charging wattage":"90 W wired","Wireless charging":"80 W","Main camera MP":"50 MP",
+"Ultrawide MP":"50 MP","Telephoto MP":"200 MP","Front camera MP":"32 MP","Main camera OIS":"Yes","Water resistance":"IP68",
+"Wi-Fi version":"Wi-Fi 7","Bluetooth version":"6.0","USB version":"USB 3.2 Gen 1","Fingerprint sensor":"Ultrasonic under-display","Stereo speakers":"Yes"
+},
+"iPhone 17 Pro Max":{
+"OS version":"iOS 26 at launch","Display panel":"OLED","Peak refresh rate":"120 Hz","Battery capacity":"Not officially published",
+"Main camera MP":"48 MP","Ultrawide MP":"48 MP","Telephoto MP":"48 MP","Front camera MP":"18 MP","Main camera OIS":"Yes","Optical zoom":"Up to 8× optical-quality range",
+"Water resistance":"IP68","Wi-Fi version":"Wi-Fi 7","Bluetooth version":"6.0","USB version":"USB 3","eSIM":"Yes","Stereo speakers":"Yes"
+},
+"Nothing Phone (3)":{
+"OS version":"Android 15 at launch","CPU model":"Qualcomm Snapdragon 8s Gen 4","Display panel":"AMOLED","Peak refresh rate":"120 Hz",
+"Battery capacity":"5150 mAh","Charging wattage":"65 W","Wireless charging":"15 W","Main camera MP":"50 MP","Ultrawide MP":"50 MP",
+"Telephoto MP":"50 MP","Front camera MP":"50 MP","Main camera OIS":"Yes","Water resistance":"IP64","Wi-Fi version":"Wi-Fi 7","Bluetooth version":"6.0",
+"Fingerprint sensor":"Under-display","Stereo speakers":"Yes"
 }
-search.oninput=show;filter.onchange=show;
-document.querySelector("#scan").onclick=async()=>{
- const b=document.querySelector("#scan");b.disabled=true;b.textContent="Scanning…";
- try{if(n.getBattery){const btr=await n.getBattery();D["Battery level"]=Math.round(btr.level*100)+"%";D["Charging"]=btr.charging?"Yes":"No"}if(n.storage?.estimate){const x=await n.storage.estimate();D["Storage estimate"]=x.quota?Math.round(x.quota/1073741824)+" GB quota":"Available"}}catch{}
- await new Promise(r=>setTimeout(r,650));b.textContent="Scan Complete ✓";show();
- setTimeout(()=>{b.disabled=false;b.textContent="Run Full Scan"},1300);
 };
-show();
+
+Object.keys(catalog).forEach(m=>{$("#models").append(new Option(m));$("#modelSelect").append(new Option(m,m))});
+
+let selectedModel="";
+function setSpec(model){
+selectedModel=model||"";
+Object.keys(data).forEach(k=>{if(data[k].type==="spec")data[k].value=null});
+if(model&&catalog[model])Object.entries(catalog[model]).forEach(([k,v])=>{if(data[k])data[k].value=v;else add(k,v,"spec","Kinz verified catalog")});
+$("#deviceName").textContent=model||"Device detected — model not verified";
+$("#deviceMeta").textContent=model?"Showing verified catalog values where available.":"Use the model field above to load phone specifications.";
+$("#status").textContent=model?"MODEL LOADED":"MODEL NEEDED";
+render();
+}
+
+async function detectModel(){
+let model="";
+try{
+if(n.userAgentData?.getHighEntropyValues){
+const u=await n.userAgentData.getHighEntropyValues(["model","platformVersion","architecture","bitness","fullVersionList"]);
+if(u.model)model=u.model;
+if(u.platformVersion)add("OS platform version",u.platformVersion,"live","User-Agent Client Hints");
+if(u.architecture)add("CPU architecture",u.architecture,"live","User-Agent Client Hints");
+if(u.bitness)add("CPU bitness",u.bitness,"live","User-Agent Client Hints");
+if(u.fullVersionList)add("Browser full version",u.fullVersionList.map(x=>x.brand+" "+x.version).join(", "),"live","User-Agent Client Hints");
+}
+}catch{}
+if(model){
+const match=Object.keys(catalog).find(x=>x.toLowerCase().includes(model.toLowerCase())||model.toLowerCase().includes(x.toLowerCase()));
+if(match)model=match;
+}
+$("#modelInput").value=model||"";
+if(model&&catalog[model])setSpec(model);else{
+$("#deviceName").textContent=model?model:"Device detected — model not exposed";
+$("#deviceMeta").textContent=model?"Model detected by browser; verified catalog match unavailable.":"This browser did not expose the exact model.";
+$("#status").textContent="READY";
+render();
+}
+}
+
+async function scan(){
+const b=$("#scan");b.disabled=true;b.textContent="Scanning…";$("#status").textContent="SCANNING";
+try{
+if(n.getBattery){
+const bat=await n.getBattery();
+data["Battery level"].value=Math.round(bat.level*100)+"%";
+data["Charging"].value=bat.charging?"Yes":"No";
+data["Charging time"].value=Number.isFinite(bat.chargingTime)?(bat.chargingTime===Infinity?"Not reported":Math.round(bat.chargingTime/60)+" min"):null;
+data["Discharging time"].value=Number.isFinite(bat.dischargingTime)?(bat.dischargingTime===Infinity?"Not reported":Math.round(bat.dischargingTime/60)+" min"):null;
+}
+}catch{}
+await new Promise(r=>setTimeout(r,650));
+b.disabled=false;b.textContent="Scan Complete ✓";$("#status").textContent=selectedModel?"MODEL + DEVICE READY":"DEVICE READY";render();
+setTimeout(()=>b.textContent="Run Full Scan",1400);
+}
+
+function render(){
+const q=$("#search").value.toLowerCase().trim(),f=$("#filter").value,root=$("#dashboard");root.innerHTML="";
+let live=0,spec=0;
+Object.values(data).forEach(x=>{if(x.value!==null&&x.value!==""){if(x.type==="spec")spec++;else live++}});
+$("#liveCount").textContent=live;$("#specCount").textContent=spec;$("#paramCount").textContent=Object.keys(data).length;$("#catCount").textContent=Object.keys(groups).length;
+Object.entries(groups).forEach(([g,items],i)=>{
+if(f!=="all"&&f!==g)return;
+const rows=items.filter(k=>k in data&&(!q||k.toLowerCase().includes(q)));
+if(!rows.length)return;
+const sec=document.createElement("section");sec.className="category"+(i===0&&!q?" open":"");
+const h=document.createElement("button");h.type="button";h.className="cathead";
+h.innerHTML=`<span><span class="catname">${g}</span><br><span class="catcount">${rows.length} parameters</span></span><span class="arrow">⌄</span>`;
+const body=document.createElement("div");body.className="rows";
+rows.forEach(k=>{
+const x=data[k],r=document.createElement("div");r.className="row";
+const val=x.value===null?"Not verified":x.value;
+const cls=x.value===null?"unknown":(x.type==="spec"?"spec":"live");
+const src=x.value===null?"":`<span class="source">${x.type==="spec"?"Spec · "+x.source:"Live · "+x.source}</span>`;
+r.innerHTML=`<span class="label">${k}</span><span class="value ${cls}">${val}${src}</span>`;
+body.appendChild(r);
+});
+h.addEventListener("click",()=>sec.classList.toggle("open"));sec.append(h,body);root.appendChild(sec);
+});
+}
+Object.keys(groups).forEach(g=>$("#filter").append(new Option(g,g)));
+$("#search").addEventListener("input",render);$("#filter").addEventListener("change",render);
+$("#scan").addEventListener("click",scan);
+$("#modelSelect").addEventListener("change",e=>{if(e.target.value){$("#modelInput").value=e.target.value;setSpec(e.target.value)}});
+$("#modelInput").addEventListener("change",e=>{const v=e.target.value.trim();const match=Object.keys(catalog).find(x=>x.toLowerCase()===v.toLowerCase());setSpec(match||"");if(v&&!match)toast("Model not in the built-in catalog yet")});
+$("#share").addEventListener("click",async()=>{try{if(n.share)await n.share({title:"Kinz Scanning",text:"Check your device information with Kinz Scanning.",url:location.href});else{toast("Copy the page URL from your browser")}}catch{}});
+detectModel();scan();render();
+
+try{
+document.querySelectorAll(".adsbygoogle").forEach(()=>{(window.adsbygoogle=window.adsbygoogle||[]).push({})});
+}catch{}
+})();
 </script>
 </body>
 </html>
