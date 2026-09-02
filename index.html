@@ -1,1 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kinz Scanning</title>
+<style>
+:root{color-scheme:dark;--bg:#07090b;--card:#101419;--line:#242b33;--text:#f2f5f7;--muted:#8c97a3;--accent:#8bd8ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:900px;margin:auto;padding:20px}
+.hero{padding:28px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(145deg,#141a20,#0a0d10)}
+.kicker{color:var(--muted);font-size:11px;letter-spacing:.18em;text-transform:uppercase}.title{font-size:38px;font-weight:800;letter-spacing:-.05em;margin:5px 0}.sub{color:var(--muted);line-height:1.5}
+button,input,select{font:inherit}.scan{margin-top:20px;width:100%;height:50px;border:0;border-radius:14px;background:var(--accent);color:#071016;font-weight:800;cursor:pointer}
+.ad{height:70px;margin:14px 0;border:1px dashed #3a424b;border-radius:14px;display:grid;place-items:center;color:#69747f;font-size:10px;letter-spacing:.14em}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{padding:15px;border:1px solid var(--line);border-radius:16px;background:var(--card)}.stat b{display:block;font-size:20px}.stat span{color:var(--muted);font-size:11px}
+.tools{display:flex;gap:10px;margin:14px 0}.search,.filter{height:46px;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:13px;padding:0 13px;outline:0}.search{flex:1}.search:focus,.filter:focus{border-color:var(--accent)}
+.category{margin:10px 0;border:1px solid var(--line);border-radius:18px;background:var(--card);overflow:hidden}.head{width:100%;padding:16px;background:none;color:inherit;border:0;text-align:left;display:flex;justify-content:space-between;cursor:pointer}.name{font-weight:750}.count{color:var(--muted);font-size:11px;margin-top:3px}.body{display:none;border-top:1px solid var(--line)}.category.open .body{display:block}
+.row{display:flex;justify-content:space-between;gap:15px;padding:12px 16px;border-bottom:1px solid #1c2228}.row:last-child{border:0}.label{color:var(--muted)}.value{text-align:right;overflow-wrap:anywhere}.det{color:#b9f4d0}.lookup{color:#f1d28f}.na{color:#77818b}
+small{color:var(--muted)}footer{text-align:center;color:#66717d;font-size:11px;padding:20px}
+@media(max-width:520px){main{padding:12px}.title{font-size:31px}.tools{flex-direction:column}.stats{gap:7px}.stat{padding:12px 9px}.row{padding:11px 12px;font-size:12px}}
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+<div class="kicker">Device intelligence</div>
+<div class="title">Kinz Scanning</div>
+<div class="sub">A deep device, browser, network and hardware-information dashboard.</div>
+<button class="scan" id="scan">Run Full Scan</button>
+</section>
 
+<div class="ad">ADVERTISEMENT · BANNER</div>
+
+<section class="stats">
+<div class="stat"><b id="detected">0</b><span>Detected now</span></div>
+<div class="stat"><b id="total">0</b><span>Parameters</span></div>
+<div class="stat"><b id="categories">0</b><span>Categories</span></div>
+</section>
+
+<div class="tools">
+<input class="search" id="search" placeholder="Search parameters…">
+<select class="filter" id="filter"><option value="all">All categories</option></select>
+</div>
+
+<div id="dashboard"></div>
+
+<div class="ad">ADVERTISEMENT · BANNER</div>
+<footer>Kinz Scanning · Detected values come from the browser/device. Lookup values require a device model and specification source.</footer>
+</main>
+
+<script>
+const n=navigator,s=screen,c=n.connection||n.mozConnection||n.webkitConnection;
+const D={
+"Device model":null,"OS version":null,"Browser version":null,"Browser engine":null,"JavaScript engine":null,
+"User agent":n.userAgent,"Platform":n.platform,"Language":n.language,"Languages":n.languages?.join(", "),
+"Online":n.onLine?"Yes":"No","Cookies enabled":n.cookieEnabled?"Yes":"No","Do Not Track":n.doNotTrack||"Not reported",
+"Logical CPU cores":n.hardwareConcurrency||null,"Reported RAM":n.deviceMemory?`${n.deviceMemory} GB`:null,"Max touch points":n.maxTouchPoints,
+"Screen width":s.width+" px","Screen height":s.height+" px","Available width":s.availWidth+" px","Available height":s.availHeight+" px",
+"Viewport width":innerWidth+" px","Viewport height":innerHeight+" px","Pixel ratio":devicePixelRatio,
+"Color depth":s.colorDepth+" bit","Pixel depth":s.pixelDepth+" bit","Orientation":s.orientation?.type,
+"Timezone":Intl.DateTimeFormat().resolvedOptions().timeZone,"UTC offset":(-new Date().getTimezoneOffset())+" min",
+"HTTPS":location.protocol==="https:"?"Yes":"No","Connection type":c?.type,"Effective connection":c?.effectiveType,
+"Downlink":c?.downlink?c.downlink+" Mbps":null,"RTT":c?.rtt?c.rtt+" ms":null,"Data saver":c?.saveData!=null?(c.saveData?"Yes":"No"):null,
+"Battery level":null,"Charging":null,
+"Battery health":null,"Battery capacity":null,"Charging wattage":null,"Wireless charging":null,"Reverse wireless charging":null,
+"CPU model":null,"CPU architecture":null,"CPU clock":null,"CPU fabrication":null,"GPU model":null,"GPU architecture":null,"GPU frequency":null,
+"RAM hardware":null,"RAM type":null,"LPDDR type":null,"Storage variants":null,"UFS version":null,
+"Display panel":null,"Display resolution":null,"Aspect ratio":null,"PPI":null,"Peak brightness":null,"Typical brightness":null,
+"Peak refresh rate":null,"Touch sampling rate":null,"Screen protection":null,"HDR":matchMedia("(dynamic-range: high)").matches?"Likely supported":null,
+"5G bands":null,"4G bands":null,"SIM type":null,"eSIM":null,"Dual SIM":null,"VoLTE":null,"VoNR":null,"Wi-Fi version":null,
+"Wi-Fi bands":null,"Wi-Fi maximum speed":null,"Wi-Fi calling":null,"Bluetooth version":null,"Bluetooth codecs":null,
+"NFC hardware":null,"Satellite connectivity":null,
+"Main camera MP":null,"Main camera aperture":null,"Main camera OIS":null,"Ultrawide MP":null,"Telephoto MP":null,
+"Front camera MP":null,"Optical zoom":null,"Digital zoom":null,"Macro camera":null,"Depth camera":null,"Main video maximum":null,
+"Front video maximum":null,"Slow motion":null,"Pro video":null,"RAW camera":null,"RAW video":null,"Dolby Vision":null,"HDR10+":null,
+"USB version":null,"USB speed":null,"USB OTG":null,"3.5mm jack":null,"Stereo speakers":null,"Audio codecs":null,"Video codecs":null,
+"Fingerprint sensor":null,"Face unlock":null,"Water resistance":null,"IR blaster":null,"FM radio":null,
+"Launch date":null,"Dimensions":null,"Weight":null,"Original price":null,
+"Web Share API":"share" in n?"Supported":"Unavailable","WebAuthn":"PublicKeyCredential" in window?"Supported":"Unavailable",
+"Bluetooth API":"bluetooth" in n?"Supported":"Unavailable","USB API":"usb" in n?"Supported":"Unavailable",
+"NFC API":"NDEFReader" in window?"Supported":"Unavailable","Geolocation API":"geolocation" in n?"Supported":"Unavailable",
+"Media devices":"mediaDevices" in n?"Supported":"Unavailable","Vibration API":"vibrate" in n?"Supported":"Unavailable",
+"Gamepad API":"getGamepads" in n?"Supported":"Unavailable","WebGL":(()=>{try{return !!document.createElement("canvas").getContext("webgl")}catch{return false}})()?"Supported":"Unavailable",
+"WebGL2":(()=>{try{return !!document.createElement("canvas").getContext("webgl2")}catch{return false}})()?"Supported":"Unavailable",
+"WebGPU":"gpu" in n?"Supported":"Unavailable","Service workers":"serviceWorker" in n?"Supported":"Unavailable",
+"Web workers":"Worker" in window?"Supported":"Unavailable","WebAssembly":"WebAssembly" in window?"Supported":"Unavailable",
+"IndexedDB":"indexedDB" in window?"Supported":"Unavailable","WebRTC":"RTCPeerConnection" in window?"Supported":"Unavailable",
+"Fetch API":"fetch" in window?"Supported":"Unavailable","WebSocket":"WebSocket" in window?"Supported":"Unavailable",
+"Crypto API":"crypto" in n?"Supported":"Unavailable","WebCodecs":"VideoDecoder" in window?"Supported":"Unavailable",
+"Media recorder":"MediaRecorder" in window?"Supported":"Unavailable","Picture-in-picture":"pictureInPictureEnabled" in document?"Supported":"Unavailable",
+"Media session":"mediaSession" in n?"Supported":"Unavailable","Wake lock":"wakeLock" in n?"Supported":"Unavailable",
+"Payment Request":"PaymentRequest" in window?"Supported":"Unavailable","Serial API":"serial" in n?"Supported":"Unavailable",
+"MIDI API":"requestMIDIAccess" in n?"Supported":"Unavailable","Speech recognition":("SpeechRecognition" in window||"webkitSpeechRecognition" in window)?"Supported":"Unavailable",
+"Speech synthesis":"speechSynthesis" in window?"Supported":"Unavailable","Barcode detection":"BarcodeDetector" in window?"Supported":"Unavailable",
+"File System Access":"showOpenFilePicker" in window?"Supported":"Unavailable","Screen capture":"getDisplayMedia" in (n.mediaDevices||{})?"Supported":"Unavailable",
+"Pointer type":matchMedia("(pointer:fine)").matches?"Fine":matchMedia("(pointer:coarse)").matches?"Coarse":"Unknown",
+"Hover support":matchMedia("(hover:hover)").matches?"Yes":"No","Dark mode":matchMedia("(prefers-color-scheme: dark)").matches?"Yes":"No",
+"Reduced motion":matchMedia("(prefers-reduced-motion: reduce)").matches?"Yes":"No","Fullscreen API":"fullscreenEnabled" in document?"Supported":"Unavailable",
+"Clipboard API":"clipboard" in n?"Supported":"Unavailable","Credentials API":"credentials" in n?"Supported":"Unavailable",
+"XR API":"xr" in n?"Supported":"Unavailable","Storage estimate":null,"Security patch":null,"Kernel version":null,"Android API level":null,
+"iOS version":null,"Bootloader status":null,"AnTuTu score":null,"Geekbench score":null
+};
+
+const groups={
+"Identity":["Device model","OS version","Browser version","Browser engine","JavaScript engine","User agent","Platform","Language","Languages"],
+"Display":["Screen width","Screen height","Available width","Available height","Viewport width","Viewport height","Pixel ratio","Color depth","Pixel depth","Orientation","Display panel","Display resolution","Aspect ratio","PPI","Peak brightness","Typical brightness","Peak refresh rate","Touch sampling rate","Screen protection","HDR"],
+"Battery & Power":["Battery level","Charging","Battery health","Battery capacity","Charging wattage","Wireless charging","Reverse wireless charging"],
+"Processor & Memory":["CPU model","CPU architecture","CPU clock","CPU fabrication","Logical CPU cores","Reported RAM","RAM hardware","RAM type","LPDDR type","GPU model","GPU architecture","GPU frequency","Storage variants","UFS version","AnTuTu score","Geekbench score"],
+"Connectivity":["5G bands","4G bands","SIM type","eSIM","Dual SIM","VoLTE","VoNR","Wi-Fi version","Wi-Fi bands","Wi-Fi maximum speed","Wi-Fi calling","Bluetooth version","Bluetooth codecs","NFC hardware","Satellite connectivity","Connection type","Effective connection","Downlink","RTT","Data saver"],
+"Camera":["Main camera MP","Main camera aperture","Main camera OIS","Ultrawide MP","Telephoto MP","Front camera MP","Optical zoom","Digital zoom","Macro camera","Depth camera","Main video maximum","Front video maximum","Slow motion","Pro video","RAW camera","RAW video","Dolby Vision","HDR10+"],
+"Ports & Audio":["USB version","USB speed","USB OTG","3.5mm jack","Stereo speakers","Audio codecs","Video codecs","IR blaster","FM radio"],
+"Sensors & Security":["Fingerprint sensor","Face unlock","Water resistance","WebAuthn","Geolocation API","Bluetooth API","NFC API","USB API","Vibration API","Wake lock","Credentials API"],
+"Web & Browser":["Web Share API","Media devices","WebRTC","WebGL","WebGL2","WebGPU","Service workers","Web workers","WebAssembly","IndexedDB","Fetch API","WebSocket","Crypto API","WebCodecs","Media recorder","Picture-in-picture","Media session","Payment Request"],
+"Advanced APIs":["Serial API","MIDI API","Speech recognition","Speech synthesis","Barcode detection","File System Access","Screen capture","Fullscreen API","Clipboard API","XR API","Gamepad API"],
+"Network & System":["Online","Cookies enabled","Do Not Track","HTTPS","Timezone","UTC offset","Pointer type","Hover support","Dark mode","Reduced motion","Storage estimate","Security patch","Kernel version","Android API level","iOS version","Bootloader status"],
+"Physical & Commercial":["Launch date","Dimensions","Weight","Original price"]
+};
+
+const lookup=new Set(Object.keys(D).filter(k=>D[k]===null));
+const dash=document.querySelector("#dashboard"), search=document.querySelector("#search"), filter=document.querySelector("#filter");
+Object.keys(groups).forEach(g=>filter.add(new Option(g,g)));
+
+function show(){
+ let q=search.value.toLowerCase(), f=filter.value;dash.innerHTML="";
+ for(const [g,items] of Object.entries(groups)){
+  if(f!=="all"&&f!==g)continue;
+  const rows=items.filter(x=>x.toLowerCase().includes(q));
+  if(!rows.length)continue;
+  const sec=document.createElement("section");sec.className="category";
+  const head=document.createElement("button");head.className="head";head.type="button";
+  head.innerHTML=`<span><span class="name">${g}</span><br><span class="count">${rows.length} parameters</span></span><span>⌄</span>`;
+  const body=document.createElement("div");body.className="body";
+  rows.forEach(k=>{const r=document.createElement("div");r.className="row";let v=D[k], cls=lookup.has(k)?(v?"lookup":"na"):(v?"det":"na");r.innerHTML=`<span class="label">${k}</span><span class="value ${cls}">${v??"Lookup required"}</span>`;body.appendChild(r)});
+  head.onclick=()=>sec.classList.toggle("open");sec.append(head,body);dash.appendChild(sec);
+ }
+ document.querySelector("#total").textContent=Object.keys(D).length;
+ document.querySelector("#categories").textContent=Object.keys(groups).length;
+ document.querySelector("#detected").textContent=Object.values(D).filter(v=>v!==null&&v!=="").length;
+}
+search.oninput=show;filter.onchange=show;
+document.querySelector("#scan").onclick=async()=>{
+ const b=document.querySelector("#scan");b.disabled=true;b.textContent="Scanning…";
+ try{if(n.getBattery){const btr=await n.getBattery();D["Battery level"]=Math.round(btr.level*100)+"%";D["Charging"]=btr.charging?"Yes":"No"}if(n.storage?.estimate){const x=await n.storage.estimate();D["Storage estimate"]=x.quota?Math.round(x.quota/1073741824)+" GB quota":"Available"}}catch{}
+ await new Promise(r=>setTimeout(r,650));b.textContent="Scan Complete ✓";show();
+ setTimeout(()=>{b.disabled=false;b.textContent="Run Full Scan"},1300);
+};
+show();
+</script>
+</body>
+</html>
